@@ -1,0 +1,1134 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Варианты дизайна и визуализации родословного древа</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: #f1f5f9;
+      color: #0f172a;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Верхняя панель переключения вариантов */
+    .showcase-header {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 50;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+      flex-wrap: wrap;
+    }
+
+    .header-title {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .header-title h1 {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .header-title p {
+      font-size: 0.78rem;
+      color: #64748b;
+    }
+
+    .variant-tabs {
+      display: flex;
+      gap: 6px;
+      background: #f1f5f9;
+      padding: 5px;
+      border-radius: 16px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab-btn:hover {
+      color: #0f172a;
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .tab-btn.active {
+      background: #ffffff;
+      color: #4f46e5;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+    }
+
+    .tab-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 99px;
+      background: #e0e7ff;
+      color: #4338ca;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .tab-btn.active .tab-num {
+      background: #4f46e5;
+      color: #ffffff;
+    }
+
+    /* Информационная плашка о выбранном варианте */
+    .variant-info-bar {
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 9px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: #334155;
+      z-index: 40;
+    }
+
+    .variant-badge {
+      font-weight: 700;
+      color: #4f46e5;
+      margin-right: 8px;
+    }
+
+    .hint-pill {
+      font-size: 0.75rem;
+      background: #e2e8f0;
+      color: #475569;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+
+    /* Рабочая область холста */
+    .stage-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .stage-container:active {
+      cursor: grabbing;
+    }
+
+    .world {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: 0 0;
+      transition: transform 0.25s var(--ease);
+    }
+
+    .world.dragging {
+      transition: none;
+    }
+
+    svg.edges-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1px;
+      height: 1px;
+      overflow: visible;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Мини-панель предпросмотра выбранного человека */
+    .preview-card {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      width: 310px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(16px);
+      border: 1px solid #cbd5e1;
+      border-radius: 20px;
+      padding: 16px 18px;
+      box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.14);
+      z-index: 45;
+      transition: all 0.25s var(--ease);
+    }
+
+    .preview-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .preview-card .p-years {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #4f46e5;
+      margin-bottom: 8px;
+    }
+
+    .preview-card .p-meta {
+      font-size: 0.78rem;
+      color: #475569;
+      line-height: 1.45;
+    }
+
+    /* Кнопки зума */
+    .zoom-bar {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 99px;
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+      z-index: 45;
+    }
+
+    .zoom-bar button {
+      border: none;
+      background: #f1f5f9;
+      color: #334155;
+      padding: 6px 12px;
+      border-radius: 99px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .zoom-bar button:hover {
+      background: #e2e8f0;
+    }
+
+    /* ==========================================================================
+       ВАРИАНТ 1: «Семейные капсулы + Ортогональная шина (90°)»
+       Супруги объединены в один блок, а линии идут четкими перпендикулярами
+       ========================================================================== */
+    .theme-v1 {
+      background-color: #f8fafc;
+      background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+    }
+
+    .v1-capsule {
+      position: absolute;
+      display: flex;
+      align-items: stretch;
+      background: #ffffff;
+      border: 2px solid #94a3b8;
+      border-radius: 18px;
+      box-shadow: 0 6px 16px -4px rgba(15, 23, 42, 0.07);
+      z-index: 3;
+      overflow: hidden;
+      transition: all 0.2s var(--ease);
+    }
+
+    .v1-capsule:hover {
+      border-color: #4f46e5;
+      box-shadow: 0 10px 24px -4px rgba(79, 70, 229, 0.16);
+    }
+
+    .v1-person {
+      width: 175px;
+      padding: 10px 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition: background 0.18s ease;
+      position: relative;
+    }
+
+    .v1-person:hover {
+      background: #f1f5f9;
+    }
+
+    .v1-person.selected {
+      background: #eef2ff;
+    }
+
+    .v1-person.male {
+      border-top: 4px solid #3b82f6;
+    }
+
+    .v1-person.female {
+      border-top: 4px solid #ec4899;
+    }
+
+    .v1-union-divider {
+      width: 38px;
+      background: #f1f5f9;
+      border-left: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #475569;
+      gap: 2px;
+    }
+
+    .v1-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #0f172a;
+      line-height: 1.2;
+    }
+
+    .v1-years {
+      font-size: 0.73rem;
+      font-weight: 600;
+      color: #64748b;
+      margin-top: 4px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ==========================================================================
+       ВАРИАНТ 2: «Ультра-минимализм: Компактные пилюли»
+       Никакого визуального шума — только ФИО, годы и супер-четкие контрастные линии
+       ========================================================================== */
+    .theme-v2 {
+      background-color: #f4f5f7;
+    }
+
+    .v2-pill {
+      position: absolute;
+      width: 190px;
+      height: 58px;
+      background: #ffffff;
+      border-radius: 999px;
+      border: 2px solid #cbd5e1;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+      z-index: 3;
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.05);
+      transition: all 0.2s var(--ease);
+    }
+
+    .v2-pill:hover {
+      transform: translateY(-2px);
+      border-color: #334155;
+    }
+
+    .v2-pill.selected {
+      border-color: #4f46e5;
+      background: #4f46e5;
+      color: #ffffff;
+      box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+    }
+
+    .v2-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 99px;
+      flex-shrink: 0;
+    }
+
+    .v2-dot.male { background: #3b82f6; }
+    .v2-dot.female { background: #ec4899; }
+    .v2-pill.selected .v2-dot { background: #ffffff; }
+
+    .v2-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .v2-title {
+      font-weight: 700;
+      font-size: 0.82rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .v2-sub {
+      font-size: 0.7rem;
+      opacity: 0.72;
+      font-weight: 600;
+    }
+
+    /* ==========================================================================
+       ВАРИАНТ 3: «Горизонтальное древо (Слева направо)»
+       Отлично читается при большом числе поколений и детей, линии не пересекаются
+       ========================================================================== */
+    .theme-v3 {
+      background-color: #ffffff;
+      background-image: linear-gradient(to right, #f1f5f9 1px, transparent 1px);
+      background-size: 280px 100%;
+    }
+
+    .v3-node {
+      position: absolute;
+      width: 210px;
+      height: 62px;
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-left-width: 5px;
+      border-radius: 12px;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 3;
+      transition: all 0.2s var(--ease);
+    }
+
+    .v3-node.male { border-left-color: #2563eb; }
+    .v3-node.female { border-left-color: #db2777; }
+
+    .v3-node:hover {
+      background: #ffffff;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+      transform: translateX(2px);
+    }
+
+    .v3-node.selected {
+      background: #eff6ff;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    /* ==========================================================================
+       ВАРИАНТ 4: «Тёмный контрастный граф (Obsidian / Светящиеся связи)»
+       Линии связей максимально яркие и контрастные на тёмном фоне
+       ========================================================================== */
+    .theme-v4 {
+      background-color: #0b0f19;
+      background-image: radial-gradient(rgba(148, 163, 184, 0.14) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    .v4-card {
+      position: absolute;
+      width: 196px;
+      height: 68px;
+      background: #161f33;
+      border: 1.5px solid #334155;
+      border-radius: 16px;
+      padding: 10px 14px;
+      color: #f8fafc;
+      cursor: pointer;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+      transition: all 0.2s var(--ease);
+    }
+
+    .v4-card:hover {
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+    }
+
+    .v4-card.selected {
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3), 0 12px 28px rgba(0, 0, 0, 0.6);
+    }
+
+    .v4-name {
+      font-weight: 700;
+      font-size: 0.84rem;
+      color: #f8fafc;
+    }
+
+    .v4-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
+
+    .v4-tag {
+      padding: 1px 7px;
+      border-radius: 99px;
+      font-weight: 600;
+      font-size: 0.68rem;
+    }
+
+    .v4-tag.male { background: rgba(56, 189, 248, 0.16); color: #38bdf8; }
+    .v4-tag.female { background: rgba(244, 114, 182, 0.16); color: #f472b6; }
+
+    /* ==========================================================================
+       ВАРИАНТ 5: «Цветовое кодирование фамильных веток (Цветные линии родов)»
+       Каждая фамильная линия имеет свой цвет связей, чтобы сразу видеть откуда род
+       ========================================================================== */
+    .theme-v5 {
+      background-color: #fbfaf8;
+    }
+
+    .v5-card {
+      position: absolute;
+      width: 194px;
+      height: 70px;
+      background: #ffffff;
+      border-radius: 14px;
+      border: 2px solid #e2e8f0;
+      padding: 10px 14px;
+      cursor: pointer;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+      transition: all 0.2s var(--ease);
+    }
+
+    .v5-card.selected {
+      transform: scale(1.04);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+    }
+
+    .v5-clan-badge {
+      font-size: 0.66rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 7px;
+      border-radius: 6px;
+      align-self: flex-start;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="showcase-header">
+    <div class="header-title">
+      <h1>Выбор визуального стиля родословного древа</h1>
+      <p>Нажмите на вкладки справа, чтобы сравнить 5 способов отображения карточек и линий связей</p>
+    </div>
+
+    <div class="variant-tabs" id="tabs">
+      <button class="tab-btn active" data-variant="v1">
+        <span class="tab-num">1</span> Семейные капсулы + Шина 90°
+      </button>
+      <button class="tab-btn" data-variant="v2">
+        <span class="tab-num">2</span> Компактные пилюли
+      </button>
+      <button class="tab-btn" data-variant="v3">
+        <span class="tab-num">3</span> Горизонтальное (Слева направо)
+      </button>
+      <button class="tab-btn" data-variant="v4">
+        <span class="tab-num">4</span> Тёмный контраст (Obsidian)
+      </button>
+      <button class="tab-btn" data-variant="v5">
+        <span class="tab-num">5</span> Цветные линии по фамилиям
+      </button>
+    </div>
+  </header>
+
+  <div class="variant-info-bar">
+    <div id="variant-desc">
+      <span class="variant-badge">Вариант 1:</span>
+      Супруги объединены в общую капсулу семьи, а линии к детям идут строгой ортогональной шиной под прямым углом (90°). Связи никогда не путаются.
+    </div>
+    <span class="hint-pill">Кликните на любого человека для подсветки его ветки • Колесико / перетаскивание работает</span>
+  </div>
+
+  <div class="stage-container theme-v1" id="stage">
+    <div class="world" id="world">
+      <svg class="edges-layer" id="svg-layer"></svg>
+      <div id="nodes-layer"></div>
+    </div>
+
+    <div class="zoom-bar">
+      <button id="btn-zoom-in">+ Приблизить</button>
+      <button id="btn-zoom-out">− Отдалить</button>
+      <button id="btn-fit">Центрировать</button>
+    </div>
+
+    <div class="preview-card" id="preview-card">
+      <h3 id="pv-name">Морозов Андрей Всеволодович</h3>
+      <div class="p-years" id="pv-years">1952 — н.в.</div>
+      <div class="p-meta" id="pv-meta">Физик-оптик, профессор • г. Москва. Нажмите на любую карточку в дереве, чтобы проверить читаемость связей.</div>
+    </div>
+  </div>
+
+  <script>
+    // Демо-данные 4 поколений для наглядного сравнения всех 5 дизайнов
+    const persons = [
+      // Поколение 0 (Прадеды и прабабушки)
+      { id: 1, first: 'Николай', middle: 'Петрович', last: 'Морозов', gender: 'male', years: '1888 — 1956', clan: 'Морозовы', color: '#2563eb', meta: 'Инженер-путеец, г. Ярославль' },
+      { id: 2, first: 'Елизавета', middle: 'Андреевна', last: 'Морозова (Воронцова)', gender: 'female', years: '1892 — 1974', clan: 'Воронцовы', color: '#d97706', meta: 'Преподаватель словесности, г. Кострома' },
+      { id: 3, first: 'Илья', middle: 'Савельевич', last: 'Соколов', gender: 'male', years: '~1890 — 1943', clan: 'Соколовы', color: '#059669', meta: 'Часовой мастер, Нижегородская губ.' },
+      { id: 4, first: 'Марфа', middle: 'Тимофеевна', last: 'Соколова (Крылова)', gender: 'female', years: '1895 — 1981', clan: 'Соколовы', color: '#059669', meta: 'Фельдшер, г. Нижний Новгород' },
+
+      // Поколение 1 (Дедушки и бабушки)
+      { id: 5, first: 'Вера', middle: 'Николаевна', last: 'Морозова', gender: 'female', years: '1925 — 2011', clan: 'Морозовы', color: '#2563eb', meta: 'Ботаник, научный сотрудник МГУ' },
+      { id: 6, first: 'Всеволод', middle: 'Николаевич', last: 'Морозов', gender: 'male', years: '1921 — 1998', clan: 'Морозовы', color: '#2563eb', meta: 'Архитектор-реставратор, г. Москва' },
+      { id: 7, first: 'Надежда', middle: 'Ильинична', last: 'Морозова (Соколова)', gender: 'female', years: '1924 — 2008', clan: 'Соколовы', color: '#059669', meta: 'Врач-педиатр, г. Москва' },
+
+      // Поколение 2 (Родители и тети)
+      { id: 8, first: 'Ольга', middle: 'Всеволодовна', last: 'Левашова (Морозова)', gender: 'female', years: '1956 — н.в.', clan: 'Морозовы', color: '#2563eb', meta: 'Искусствовед, г. Санкт-Петербург' },
+      { id: 9, first: 'Андрей', middle: 'Всеволодович', last: 'Морозов', gender: 'male', years: '1952 — н.в.', clan: 'Морозовы', color: '#2563eb', meta: 'Физик-оптик, профессор, г. Москва' },
+      { id: 10, first: 'Елена', middle: 'Сергеевна', last: 'Морозова (Белова)', gender: 'female', years: '1955 — н.в.', clan: 'Беловы', color: '#9333ea', meta: 'Музыкальный редактор, г. Казань' },
+
+      // Поколение 3 (Современное поколение)
+      { id: 11, first: 'Мария', middle: 'Андреевна', last: 'Морозова', gender: 'female', years: '1988 — н.в.', clan: 'Морозовы', color: '#2563eb', meta: 'Морской биолог, г. Калининград' },
+      { id: 12, first: 'Дмитрий', middle: 'Андреевич', last: 'Морозов', gender: 'male', years: '1984 — н.в.', clan: 'Морозовы', color: '#2563eb', meta: 'Системный архитектор, г. Москва' },
+      { id: 13, first: 'Анна', middle: 'Викторовна', last: 'Морозова (Орлова)', gender: 'female', years: '1986 — н.в.', clan: 'Орловы', color: '#e11d48', meta: 'Графический дизайнер' },
+
+      // Поколение 4 (Дети)
+      { id: 14, first: 'Лев', middle: 'Дмитриевич', last: 'Морозов', gender: 'male', years: '2015 — н.в.', clan: 'Морозовы', color: '#2563eb', meta: 'Школьник, г. Москва' },
+    ];
+
+    const unions = [
+      { id: 101, p1: 1, p2: 2, year: 1918, children: [5, 6], color: '#2563eb' },
+      { id: 102, p1: 3, p2: 4, year: 1920, children: [7], color: '#059669' },
+      { id: 103, p1: 6, p2: 7, year: 1949, children: [8, 9], color: '#2563eb' },
+      { id: 104, p1: 9, p2: 10, year: 1981, children: [11, 12], color: '#2563eb' },
+      { id: 105, p1: 12, p2: 13, year: 2012, children: [14], color: '#2563eb' },
+    ];
+
+    const personMap = new Map(persons.map(p => [p.id, p]));
+
+    const descriptions = {
+      v1: '<span class="variant-badge">Вариант 1 (Семейные капсулы + Ортогональная шина 90°):</span> Супруги объединены в единый блок-капсулу, а к детям идет четкая П-образная линия-шина с точками ветвления. Никаких пересекающихся пучков кривых.',
+      v2: '<span class="variant-badge">Вариант 2 (Ультра-минимализм / Компактные пилюли):</span> Только имя и годы жизни в компактных овальных плашках. Контрастные линии связей с маркерами позволяют уместить огромное древо на одном экране.',
+      v3: '<span class="variant-badge">Вариант 3 (Горизонтальное древо слева направо):</span> Поколения идут слева направо. Очень удобно, когда в семьях много братьев и сестер — карточки идут аккуратным столбиком сверху вниз.',
+      v4: '<span class="variant-badge">Вариант 4 (Тёмный контраст Obsidian):</span> Тёмное полотно, на котором линии связей подсвечены ярким золотистым/голубым свечением и видны с первого взгляда.',
+      v5: '<span class="variant-badge">Вариант 5 (Цветные линии по фамильным родам):</span> Каждая фамильная ветка (Морозовы, Соколовы, Беловы) окрашивает свои линии связей в собственный цвет — сразу видно слияние родов!'
+    };
+
+    let currentVariant = 'v1';
+    let selectedId = 9;
+    let panX = 80;
+    let panY = 50;
+    let scale = 0.95;
+
+    const stage = document.getElementById('stage');
+    const world = document.getElementById('world');
+    const svgLayer = document.getElementById('svg-layer');
+    const nodesLayer = document.getElementById('nodes-layer');
+
+    // Вычисление активной линии родства для выбранного человека
+    function getHighlightedSet(targetId) {
+      const pSet = new Set([targetId]);
+      const uSet = new Set();
+
+      // Вверх к предкам
+      let queue = [targetId];
+      while (queue.length) {
+        const curr = queue.shift();
+        for (const u of unions) {
+          if (u.children.includes(curr)) {
+            uSet.add(u.id);
+            [u.p1, u.p2].forEach(pid => {
+              if (pid && !pSet.has(pid)) {
+                pSet.add(pid);
+                queue.push(pid);
+              }
+            });
+          }
+        }
+      }
+
+      // Вниз к потомкам
+      queue = [targetId];
+      while (queue.length) {
+        const curr = queue.shift();
+        for (const u of unions) {
+          if (u.p1 === curr || u.p2 === curr) {
+            uSet.add(u.id);
+            u.children.forEach(cid => {
+              if (!pSet.has(cid)) {
+                pSet.add(cid);
+                queue.push(cid);
+              }
+            });
+          }
+        }
+      }
+
+      // Супруг выбранного
+      for (const u of unions) {
+        if (u.p1 === targetId && u.p2) pSet.add(u.p2);
+        if (u.p2 === targetId && u.p1) pSet.add(u.p1);
+      }
+
+      return { pSet, uSet };
+    }
+
+    function selectPerson(id) {
+      selectedId = id;
+      const p = personMap.get(id);
+      if (p) {
+        document.getElementById('pv-name').textContent = `${p.last} ${p.first} ${p.middle}`;
+        document.getElementById('pv-years').textContent = p.years;
+        document.getElementById('pv-meta').textContent = `${p.meta} • Род: ${p.clan}`;
+      }
+      render();
+    }
+
+    // Координаты для вертикальных вариантов (v1, v2, v4, v5)
+    function getVerticalCoords() {
+      return {
+        1: { x: 220, y: 70 },
+        2: { x: 430, y: 70 },
+        3: { x: 760, y: 70 },
+        4: { x: 970, y: 70 },
+
+        5: { x: 110, y: 240 },
+        6: { x: 350, y: 240 },
+        7: { x: 560, y: 240 },
+
+        8: { x: 230, y: 410 },
+        9: { x: 470, y: 410 },
+        10: { x: 680, y: 410 },
+
+        11: { x: 350, y: 580 },
+        12: { x: 590, y: 580 },
+        13: { x: 800, y: 580 },
+
+        14: { x: 695, y: 750 },
+      };
+    }
+
+    // Ортогональный (ступенчатый 90° со скругленными углами) путь от (x1, y1) к (x2, y2)
+    function orthoPath(x1, y1, x2, y2, midY) {
+      const r = 10;
+      if (Math.abs(x1 - x2) < 2) {
+        return `M ${x1} ${y1} L ${x2} ${y2}`;
+      }
+      const dir = x2 > x1 ? 1 : -1;
+      const rad = Math.min(r, Math.abs(x2 - x1) / 2, Math.abs(midY - y1), Math.abs(y2 - midY));
+      return [
+        `M ${x1} ${y1}`,
+        `L ${x1} ${midY - rad}`,
+        `Q ${x1} ${midY} ${x1 + dir * rad} ${midY}`,
+        `L ${x2 - dir * rad} ${midY}`,
+        `Q ${x2} ${midY} ${x2} ${midY + rad}`,
+        `L ${x2} ${y2}`
+      ].join(' ');
+    }
+
+    function renderV1(hl) {
+      // В Варианте 1 супружеские пары рисуются как единые капсулы, а одиночки — как половина капсулы
+      const capsules = [
+        { type: 'couple', u: unions[0], x: 180, y: 50 },
+        { type: 'couple', u: unions[1], x: 720, y: 50 },
+        { type: 'single', p: personMap.get(5), x: 60, y: 230 },
+        { type: 'couple', u: unions[2], x: 310, y: 230 },
+        { type: 'single', p: personMap.get(8), x: 170, y: 410 },
+        { type: 'couple', u: unions[3], x: 430, y: 410 },
+        { type: 'single', p: personMap.get(11), x: 290, y: 590 },
+        { type: 'couple', u: unions[4], x: 550, y: 590 },
+        { type: 'single', p: personMap.get(14), x: 650, y: 760 },
+      ];
+
+      const anchorTop = {};
+      const unionBottom = {};
+
+      capsules.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'v1-capsule';
+        el.style.left = `${item.x}px`;
+        el.style.top = `${item.y}px`;
+
+        if (item.type === 'couple') {
+          const p1 = personMap.get(item.u.p1);
+          const p2 = personMap.get(item.u.p2);
+          const w = 175 * 2 + 38;
+          anchorTop[p1.id] = { x: item.x + 87, y: item.y };
+          anchorTop[p2.id] = { x: item.x + 175 + 38 + 87, y: item.y };
+          unionBottom[item.u.id] = { x: item.x + w / 2, y: item.y + 66 };
+
+          el.innerHTML = `
+            <div class="v1-person ${p1.gender} ${selectedId === p1.id ? 'selected' : ''}" data-id="${p1.id}">
+              <div class="v1-name">${p1.last} ${p1.first}</div>
+              <div class="v1-years">${p1.years}</div>
+            </div>
+            <div class="v1-union-divider" title="Год свадьбы: ${item.u.year}">
+              <span>∞</span>
+              <span>${item.u.year}</span>
+            </div>
+            <div class="v1-person ${p2.gender} ${selectedId === p2.id ? 'selected' : ''}" data-id="${p2.id}">
+              <div class="v1-name">${p2.last} ${p2.first}</div>
+              <div class="v1-years">${p2.years}</div>
+            </div>
+          `;
+        } else {
+          const p = item.p;
+          anchorTop[p.id] = { x: item.x + 87, y: item.y };
+          el.innerHTML = `
+            <div class="v1-person ${p.gender} ${selectedId === p.id ? 'selected' : ''}" data-id="${p.id}">
+              <div class="v1-name">${p.last} ${p.first}</div>
+              <div class="v1-years">${p.years}</div>
+            </div>
+          `;
+        }
+        nodesLayer.appendChild(el);
+      });
+
+      // Рисуем четкие ортогональные шины 90° от союза к детям
+      let svgHtml = '';
+      unions.forEach(u => {
+        const start = unionBottom[u.id];
+        if (!start) return;
+        const isUnionActive = hl.uSet.has(u.id);
+        const midY = start.y + 48;
+
+        // Точка выхода из капсулы родителей
+        svgHtml += `<circle cx="${start.x}" cy="${start.y}" r="4.5" fill="${isUnionActive ? '#4f46e5' : '#64748b'}" />`;
+
+        u.children.forEach(cid => {
+          const end = anchorTop[cid];
+          if (!end) return;
+          const active = isUnionActive && hl.pSet.has(cid);
+          const stroke = active ? '#4f46e5' : '#94a3b8';
+          const width = active ? 3.2 : 2.2;
+          const d = orthoPath(start.x, start.y, end.x, end.y, midY);
+          svgHtml += `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${width}" stroke-linecap="round" />`;
+          svgHtml += `<circle cx="${end.x}" cy="${end.y}" r="4" fill="${stroke}" />`;
+        });
+      });
+
+      svgLayer.innerHTML = svgHtml;
+    }
+
+    function renderV2(hl) {
+      const coords = getVerticalCoords();
+      const W = 190, H = 58;
+
+      persons.forEach(p => {
+        const c = coords[p.id];
+        const el = document.createElement('div');
+        el.className = `v2-pill ${selectedId === p.id ? 'selected' : ''}`;
+        el.style.left = `${c.x - W / 2}px`;
+        el.style.top = `${c.y - H / 2}px`;
+        el.dataset.id = p.id;
+        el.innerHTML = `
+          <span class="v2-dot ${p.gender}"></span>
+          <div class="v2-text">
+            <div class="v2-title">${p.last.split(' ')[0]} ${p.first}</div>
+            <div class="v2-sub">${p.years}</div>
+          </div>
+        `;
+        nodesLayer.appendChild(el);
+      });
+
+      let svgHtml = '';
+      unions.forEach(u => {
+        const c1 = coords[u.p1];
+        const c2 = coords[u.p2];
+        const ux = (c1.x + c2.x) / 2;
+        const uy = c1.y;
+        const isU = hl.uSet.has(u.id);
+        const pStroke = isU ? '#4f46e5' : '#475569';
+
+        // Линия между супругами
+        svgHtml += `<line x1="${c1.x + W / 2}" y1="${c1.y}" x2="${c2.x - W / 2}" y2="${c2.y}" stroke="${pStroke}" stroke-width="2.5" stroke-dasharray="4 3" />`;
+        svgHtml += `<circle cx="${ux}" cy="${uy}" r="6" fill="#ffffff" stroke="${pStroke}" stroke-width="2.5" />`;
+
+        u.children.forEach(cid => {
+          const childC = coords[cid];
+          const active = isU && hl.pSet.has(cid);
+          const stroke = active ? '#4f46e5' : '#94a3b8';
+          const width = active ? 3 : 2;
+          const d = orthoPath(ux, uy + 6, childC.x, childC.y - H / 2, uy + 82);
+          svgHtml += `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${width}" />`;
+        });
+      });
+      svgLayer.innerHTML = svgHtml;
+    }
+
+    function renderV3(hl) {
+      // Горизонтальная раскладка (Поколения слева направо: X = поколение, Y = позиция в столбике)
+      const hCoords = {
+        1: { x: 80, y: 90 },
+        2: { x: 80, y: 175 },
+        3: { x: 80, y: 340 },
+        4: { x: 80, y: 425 },
+
+        5: { x: 370, y: 75 },
+        6: { x: 370, y: 165 },
+        7: { x: 370, y: 380 },
+
+        8: { x: 660, y: 190 },
+        9: { x: 660, y: 280 },
+        10: { x: 660, y: 365 },
+
+        11: { x: 950, y: 240 },
+        12: { x: 950, y: 330 },
+        13: { x: 950, y: 415 },
+
+        14: { x: 1240, y: 372 },
+      };
+
+      const W = 210, H = 62;
+      persons.forEach(p => {
+        const c = hCoords[p.id];
+        const el = document.createElement('div');
+        el.className = `v3-node ${p.gender} ${selectedId === p.id ? 'selected' : ''}`;
+        el.style.left = `${c.x}px`;
+        el.style.top = `${c.y - H / 2}px`;
+        el.dataset.id = p.id;
+        el.innerHTML = `
+          <div class="v1-name">${p.last.split(' ')[0]} ${p.first}</div>
+          <div class="v1-years">${p.years}</div>
+        `;
+        nodesLayer.appendChild(el);
+      });
+
+      let svgHtml = '';
+      unions.forEach(u => {
+        const c1 = hCoords[u.p1];
+        const c2 = hCoords[u.p2];
+        const startX = c1.x + W;
+        const midY = (c1.y + c2.y) / 2;
+        const braceX = startX + 22;
+        const isU = hl.uSet.has(u.id);
+        const baseColor = isU ? '#2563eb' : '#94a3b8';
+
+        // Скобка объединения супругов справа от их карточек
+        svgHtml += `<path d="M ${startX} ${c1.y} L ${braceX} ${c1.y} L ${braceX} ${c2.y} L ${startX} ${c2.y}" fill="none" stroke="${baseColor}" stroke-width="2.2" />`;
+        svgHtml += `<circle cx="${braceX}" cy="${midY}" r="4.5" fill="${baseColor}" />`;
+
+        u.children.forEach(cid => {
+          const ch = hCoords[cid];
+          const endX = ch.x;
+          const endY = ch.y;
+          const active = isU && hl.pSet.has(cid);
+          const stroke = active ? '#2563eb' : '#cbd5e1';
+          const width = active ? 3 : 2;
+          const cpx = (braceX + endX) / 2;
+          svgHtml += `<path d="M ${braceX} ${midY} C ${cpx} ${midY}, ${cpx} ${endY}, ${endX} ${endY}" fill="none" stroke="${stroke}" stroke-width="${width}" />`;
+        });
+      });
+
+      svgLayer.innerHTML = svgHtml;
+    }
+
+    function renderV4(hl) {
+      const coords = getVerticalCoords();
+      const W = 196, H = 68;
+
+      persons.forEach(p => {
+        const c = coords[p.id];
+        const el = document.createElement('div');
+        el.className = `v4-card ${selectedId === p.id ? 'selected' : ''}`;
+        el.style.left = `${c.x - W / 2}px`;
+        el.style.top = `${c.y - H / 2}px`;
+        el.dataset.id = p.id;
+        el.innerHTML = `
+          <div class="v4-name">${p.last.split(' ')[0]} ${p.first}</div>
+          <div class="v4-bottom">
+            <span>${p.years}</span>
+            <span class="v4-tag ${p.gender}">${p.gender === 'male' ? 'М' : 'Ж'}</span>
+          </div>
+        `;
+        nodesLayer.appendChild(el);
+      });
+
+      let svgHtml = '';
+      unions.forEach(u => {
+        const c1 = coords[u.p1];
+        const c2 = coords[u.p2];
+        const ux = (c1.x + c2.x) / 2;
+        const uy = c1.y;
+        const isU = hl.uSet.has(u.id);
+        const pStroke = isU ? '#f59e0b' : '#475569';
+
+        svgHtml += `<line x1="${c1.x + W / 2}" y1="${c1.y}" x2="${c2.x - W / 2}" y2="${c2.y}" stroke="${pStroke}" stroke-width="2.5" />`;
+        svgHtml += `<circle cx="${ux}" cy="${uy}" r="5" fill="#0b0f19" stroke="${pStroke}" stroke-width="2.5" />`;
+
+        u.children.forEach(cid => {
+          const childC = coords[cid];
+          const active = isU && hl.pSet.has(cid);
+          const stroke = active ? '#f59e0b' : '#38bdf8';
+          const opacity = active ? '1' : '0.45';
+          const width = active ? 3.2 : 2;
+          const d = orthoPath(ux, uy + 5, childC.x, childC.y - H / 2, uy + 85);
+          svgHtml += `<path d="${d}" fill="none" stroke="${stroke}" stroke-opacity="${opacity}" stroke-width="${width}" />`;
+        });
+      });
+
+      svgLayer.innerHTML = svgHtml;
+    }
+
+    function renderV5(hl) {
+      const coords = getVerticalCoords();
+      const W = 194, H = 70;
+
+      persons.forEach(p => {
+        const c = coords[p.id];
+        const el = document.createElement('div');
+        el.className = `v5-card ${selectedId === p.id ? 'selected' : ''}`;
+        el.style.left = `${c.x - W / 2}px`;
+        el.style.top = `${c.y - H / 2}px`;
+        el.style.borderColor = selectedId === p.id ? p.color : '#e2e8f0';
+        el.dataset.id = p.id;
+        el.innerHTML = `
+          <span class="v5-clan-badge" style="background: ${p.color}18; color: ${p.color};">${p.clan}</span>
+          <div class="v1-name">${p.last.split(' ')[0]} ${p.first}</div>
+          <div class="v1-years">${p.years}</div>
+        `;
+        nodesLayer.appendChild(el);
+      });
+
+      let svgHtml = '';
+      unions.forEach(u => {
+        const c1 = coords[u.p1];
+        const c2 = coords[u.p2];
+        const ux = (c1.x + c2.x) / 2;
+        const uy = c1.y;
+
+        svgHtml += `<line x1="${c1.x + W / 2}" y1="${c1.y}" x2="${c2.x - W / 2}" y2="${c2.y}" stroke="${u.color}" stroke-width="3" />`;
+        svgHtml += `<circle cx="${ux}" cy="${uy}" r="6" fill="${u.color}" />`;
+
+        u.children.forEach(cid => {
+          const childC = coords[cid];
+          const d = orthoPath(ux, uy + 6, childC.x, childC.y - H / 2, uy + 84);
+          svgHtml += `<path d="${d}" fill="none" stroke="${u.color}" stroke-width="2.8" />`;
+        });
+      });
+
+      svgLayer.innerHTML = svgHtml;
+    }
+
+    function render() {
+      nodesLayer.innerHTML = '';
+      svgLayer.innerHTML = '';
+      stage.className = `stage-container theme-${currentVariant}`;
+      document.getElementById('variant-desc').innerHTML = descriptions[currentVariant];
+
+      const hl = getHighlightedSet(selectedId);
+
+      if (currentVariant === 'v1') renderV1(hl);
+      else if (currentVariant === 'v2') renderV2(hl);
+      else if (currentVariant === 'v3') renderV3(hl);
+      else if (currentVariant === 'v4') renderV4(hl);
+      else if (currentVariant === 'v5') renderV5(hl);
+
+      nodesLayer.querySelectorAll('[data-id]').forEach(node => {
+        node.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectPerson(Number(node.dataset.id));
+        });
+      });
+
+      updateTransform();
+    }
+
+    function updateTransform() {
+      world.style.transform = `translate3d(${panX}px, ${panY}px, 0) scale(${scale})`;
+    }
+
+    // Переключение вкладок
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentVariant = btn.dataset.variant;
+        panX = 80;
+        panY = 45;
+        scale = 0.92;
+        render();
+      });
+    });
+
+    // Pan & Zoom
+    let isDragging = false, startX = 0, startY = 0;
+    stage.addEventListener('mousedown', e => {
+      if (e.target.closest('[data-id]') || e.target.closest('.zoom-bar') || e.target.closest('.preview-card')) return;
+      isDragging = true;
+      world.classList.add('dragging');
+      startX = e.clientX - panX;
+      startY = e.clientY - panY;
+    });
+
+    window.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      updateTransform();
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+      world.classList.remove('dragging');
+    });
+
+    stage.addEventListener('wheel', e => {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.1 : 0.9;
+      scale = Math.min(Math.max(scale * factor, 0.35), 2.0);
+      updateTransform();
+    }, { passive: false });
+
+    document.getElementById('btn-zoom-in').addEventListener('click', () => {
+      scale = Math.min(scale * 1.15, 2.0);
+      updateTransform();
+    });
+    document.getElementById('btn-zoom-out').addEventListener('click', () => {
+      scale = Math.max(scale * 0.85, 0.35);
+      updateTransform();
+    });
+    document.getElementById('btn-fit').addEventListener('click', () => {
+      panX = 80;
+      panY = 45;
+      scale = 0.92;
+      updateTransform();
+    });
+
+    render();
+  </script>
+</body>
+</html>

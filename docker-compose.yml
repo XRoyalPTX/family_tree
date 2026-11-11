@@ -1,0 +1,14 @@
+services:
+  family-tree:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: family-tree-app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/backend/data
+    environment:
+      - DATABASE_URL=sqlite:////app/backend/data/family_tree.db
+      - STATIC_DIR=/app/frontend/dist
+    restart: unless-stopped
