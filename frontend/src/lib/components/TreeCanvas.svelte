@@ -28,6 +28,7 @@
   let dragStartY = 0;
   let movedDuringDrag = false;
   let isAnimatingCamera = false;
+  let hoveredUnionId = null;
 
   $: layout = computeTreeLayout(persons, unions, childRelations, orientation);
   $: lineage = getLineageSet(
@@ -253,26 +254,30 @@
       <svg class="connections-svg">
         <!-- Partner brackets / links -->
         {#each layout.partnerEdges as pe (pe.id)}
-          {@const isHighlighted = lineage.activeUnionIds.has(pe.unionId)}
+          {@const isHighlighted =
+            lineage.activeUnionIds.has(pe.unionId) || hoveredUnionId === pe.unionId}
           <path
             d={pe.path}
             class="partner-bracket"
             class:line-active={isHighlighted}
             class:line-dimmed={selectedPersonId && highlightLineage && !isHighlighted}
+            style={!isHighlighted && pe.color ? `stroke: ${pe.color};` : ''}
           />
         {/each}
 
         <!-- Parent-union to Child orthogonal bus lines -->
         {#each layout.childEdges as ce (ce.id)}
           {@const isHighlighted =
-            lineage.activeUnionIds.has(ce.unionId) &&
-            lineage.allHighlightedIds.has(ce.childId)}
+            (lineage.activeUnionIds.has(ce.unionId) &&
+              lineage.allHighlightedIds.has(ce.childId)) ||
+            hoveredUnionId === ce.unionId}
           <path
             d={ce.path}
             class="child-bus-line"
             class:curve-adopted={ce.relationType === 'adopted'}
             class:line-active={isHighlighted}
             class:line-dimmed={selectedPersonId && highlightLineage && !isHighlighted}
+            style={!isHighlighted && ce.color ? `stroke: ${ce.color};` : ''}
           />
           <circle
             cx={ce.endX}
@@ -281,6 +286,7 @@
             class="junction-dot"
             class:dot-active={isHighlighted}
             class:line-dimmed={selectedPersonId && highlightLineage && !isHighlighted}
+            style={!isHighlighted && ce.color ? `fill: ${ce.color};` : ''}
           />
         {/each}
       </svg>
@@ -291,15 +297,17 @@
           <button
             type="button"
             class="union-badge"
-            class:union-active={lineage.activeUnionIds.has(un.id)}
-            style="left: {un.x}px; top: {un.y}px;"
+            class:union-active={lineage.activeUnionIds.has(un.id) || hoveredUnionId === un.id}
+            style="left: {un.x}px; top: {un.y}px; {un.color ? `border-color: ${un.color}; color: ${un.color};` : ''}"
             title={un.union.marriage_place
               ? `Брак: ${un.union.marriage_year || ''} (${un.union.marriage_place}) — нажмите для редактирования`
               : 'Нажмите, чтобы редактировать сведения о браке / свадьбе'}
+            on:mouseenter={() => (hoveredUnionId = un.id)}
+            on:mouseleave={() => (hoveredUnionId = null)}
             on:mousedown|stopPropagation
             on:click|stopPropagation={() => onEditUnion(un.union)}
           >
-            <span class="ring-symbol">∞</span>
+            <span class="ring-symbol" style={un.color ? `color: ${un.color};` : ''}>∞</span>
             {#if un.union.marriage_year}
               <span class="marriage-year">{un.union.marriage_year}</span>
             {/if}
@@ -308,7 +316,7 @@
           <!-- Small junction dot for single-parent union -->
           <div
             class="single-parent-dot"
-            style="left: {un.x}px; top: {un.y}px;"
+            style="left: {un.x}px; top: {un.y}px; {un.color ? `background: ${un.color};` : ''}"
           ></div>
         {/if}
       {/each}
@@ -438,28 +446,27 @@
 
   .partner-bracket {
     fill: none;
-    stroke: #64748b;
-    stroke-width: 2.4px;
+    stroke: #475569;
+    stroke-width: 2.6px;
     stroke-linecap: round;
     stroke-linejoin: round;
-    transition: stroke 0.25s ease, opacity 0.25s ease, stroke-width 0.25s ease;
+    opacity: 0.88;
+    transition: stroke 0.2s ease, opacity 0.2s ease, stroke-width 0.2s ease;
   }
 
   .child-bus-line {
     fill: none;
-    stroke: #94a3b8;
-    stroke-width: 2.2px;
+    stroke: #475569;
+    stroke-width: 2.5px;
     stroke-linecap: round;
     stroke-linejoin: round;
-    transition: stroke 0.25s ease, opacity 0.25s ease, stroke-width 0.25s ease;
+    opacity: 0.88;
+    transition: stroke 0.2s ease, opacity 0.2s ease, stroke-width 0.2s ease;
   }
 
-  :global([data-theme='dark']) .partner-bracket {
-    stroke: #94a3b8;
-  }
-
+  :global([data-theme='dark']) .partner-bracket,
   :global([data-theme='dark']) .child-bus-line {
-    stroke: #64748b;
+    stroke: #94a3b8;
   }
 
   .child-bus-line.curve-adopted {
@@ -468,20 +475,24 @@
 
   .line-active {
     stroke: var(--accent-primary) !important;
-    stroke-width: 3.2px;
+    stroke-width: 3.6px !important;
+    opacity: 1 !important;
+    filter: drop-shadow(0 0 5px rgba(79, 70, 229, 0.45));
   }
 
   .junction-dot {
-    fill: #94a3b8;
-    transition: fill 0.25s ease, opacity 0.25s ease;
+    fill: #475569;
+    transition: fill 0.2s ease, opacity 0.2s ease, r 0.2s ease;
   }
 
   .junction-dot.dot-active {
-    fill: var(--accent-primary);
+    fill: var(--accent-primary) !important;
+    r: 5px;
+    filter: drop-shadow(0 0 4px var(--accent-primary));
   }
 
   .line-dimmed {
-    opacity: 0.22;
+    opacity: 0.16 !important;
   }
 
   .generation-marker {

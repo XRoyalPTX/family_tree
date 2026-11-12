@@ -1,0 +1,584 @@
+{
+  "persons": [
+    {
+      "id": 15,
+      "first_name": "Владислав",
+      "middle_name": "Петрович",
+      "last_name": "Архинчеев",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": 2004,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 16,
+      "first_name": "Петр",
+      "middle_name": "Геннадьевич",
+      "last_name": "Архинчеев",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": 1977,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 17,
+      "first_name": "Арьяна",
+      "middle_name": "Петровна",
+      "last_name": "Архинчеева",
+      "maiden_name": null,
+      "gender": "female",
+      "birth_year": 2010,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 18,
+      "first_name": "Айнур",
+      "middle_name": "Петрович",
+      "last_name": "Архинчеев",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": 2013,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 19,
+      "first_name": "Инна",
+      "middle_name": "Петровна",
+      "last_name": "Архинчеева",
+      "maiden_name": null,
+      "gender": "female",
+      "birth_year": 2015,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 20,
+      "first_name": "Номина",
+      "middle_name": "Доржоевна",
+      "last_name": "Цыдыпова",
+      "maiden_name": null,
+      "gender": "female",
+      "birth_year": 2004,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 21,
+      "first_name": "Зинаида",
+      "middle_name": "Булатовна",
+      "last_name": "Архинчеева",
+      "maiden_name": "Цыдыпова",
+      "gender": "female",
+      "birth_year": 1981,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 22,
+      "first_name": "Геннадий",
+      "middle_name": "Жатунович",
+      "last_name": "Архинчеев",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": 1952,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 23,
+      "first_name": "Мария",
+      "middle_name": "Михайловна",
+      "last_name": "Архинчеева",
+      "maiden_name": "Алсаткина",
+      "gender": "female",
+      "birth_year": 1951,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 24,
+      "first_name": "Любовь",
+      "middle_name": "Геннадьевна",
+      "last_name": "Хамаева",
+      "maiden_name": "Архинчеева",
+      "gender": "female",
+      "birth_year": 1971,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 25,
+      "first_name": "Николай",
+      "middle_name": null,
+      "last_name": "Хамаев",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": 0,
+      "death_year": null,
+      "is_alive": 0
+    },
+    {
+      "id": 26,
+      "first_name": "Валерия",
+      "middle_name": "Николаевна",
+      "last_name": "Хамаева",
+      "maiden_name": null,
+      "gender": "female",
+      "birth_year": 2001,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 27,
+      "first_name": "Раиса",
+      "middle_name": "Геннадьевна",
+      "last_name": "Зандакова",
+      "maiden_name": "Архинчеева",
+      "gender": "female",
+      "birth_year": 1979,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 28,
+      "first_name": "Александр",
+      "middle_name": null,
+      "last_name": "Зандаков",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": null,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 29,
+      "first_name": "Майдар",
+      "middle_name": "Александрович",
+      "last_name": "Зандаков",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": 2006,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 30,
+      "first_name": "Евгения",
+      "middle_name": "Александровна",
+      "last_name": "Зандакова",
+      "maiden_name": null,
+      "gender": "female",
+      "birth_year": null,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 31,
+      "first_name": "Дарина",
+      "middle_name": "Александровна",
+      "last_name": "Зандакова",
+      "maiden_name": null,
+      "gender": "female",
+      "birth_year": null,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 32,
+      "first_name": "Надежда",
+      "middle_name": "Геннадьевна",
+      "last_name": "Архинчеева",
+      "maiden_name": null,
+      "gender": "female",
+      "birth_year": 1981,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 33,
+      "first_name": "Владимир",
+      "middle_name": "Геннадьевич",
+      "last_name": "Архинчеев",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": 1983,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 34,
+      "first_name": "Булат (Дамби)",
+      "middle_name": "Залхаевич",
+      "last_name": "Цыдыпов",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": 1946,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 35,
+      "first_name": "Мыдыгма",
+      "middle_name": "Борисовна",
+      "last_name": "Цыдыпова",
+      "maiden_name": "Гармаева",
+      "gender": "female",
+      "birth_year": 1947,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 36,
+      "first_name": "Доржо",
+      "middle_name": "Булатович",
+      "last_name": "Цыдыпов",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": null,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 37,
+      "first_name": "Елена",
+      "middle_name": "Булатовна",
+      "last_name": "Доржиева",
+      "maiden_name": "Цыдыпова",
+      "gender": "female",
+      "birth_year": null,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 38,
+      "first_name": "Юлия",
+      "middle_name": "Булатовна",
+      "last_name": "Цыжипова",
+      "maiden_name": "Цыдыпова",
+      "gender": "female",
+      "birth_year": null,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 39,
+      "first_name": "Баир",
+      "middle_name": "Булатович",
+      "last_name": "Цыдыпов",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": null,
+      "death_year": null,
+      "is_alive": 0
+    },
+    {
+      "id": 40,
+      "first_name": "Наталья",
+      "middle_name": null,
+      "last_name": "Архинчеева",
+      "maiden_name": "Рампилова",
+      "gender": "female",
+      "birth_year": null,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 41,
+      "first_name": "Эрдэни",
+      "middle_name": "Владимирович",
+      "last_name": "Архинчеев",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": 2008,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 42,
+      "first_name": "Эрдэм",
+      "middle_name": "Владимирович",
+      "last_name": "Архинчеев",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": null,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 43,
+      "first_name": "Аюр",
+      "middle_name": "Владимирович",
+      "last_name": "Архинчеев",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": null,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 44,
+      "first_name": "Батор",
+      "middle_name": null,
+      "last_name": "Доржиев",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": null,
+      "death_year": null,
+      "is_alive": 0
+    },
+    {
+      "id": 45,
+      "first_name": "Баир",
+      "middle_name": "Баторович",
+      "last_name": "Доржиев",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": 1991,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 46,
+      "first_name": "Эрдэм",
+      "middle_name": "Баторович",
+      "last_name": "Доржиев",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": 1996,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 47,
+      "first_name": "Соном",
+      "middle_name": "Баторович",
+      "last_name": "Доржиев",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": 2004,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 48,
+      "first_name": "Суржана",
+      "middle_name": "Баторовна",
+      "last_name": "Доржиева",
+      "maiden_name": null,
+      "gender": "female",
+      "birth_year": 2014,
+      "death_year": null,
+      "is_alive": 1
+    },
+    {
+      "id": 49,
+      "first_name": "Петр",
+      "middle_name": "Матвеевич",
+      "last_name": "Мункоев",
+      "maiden_name": null,
+      "gender": "male",
+      "birth_year": null,
+      "death_year": null,
+      "is_alive": 1
+    }
+  ],
+  "unions": [
+    {
+      "id": 6,
+      "partner1_id": 16,
+      "partner2_id": 21,
+      "union_type": "married",
+      "marriage_year": 2002
+    },
+    {
+      "id": 7,
+      "partner1_id": 22,
+      "partner2_id": 23,
+      "union_type": "married",
+      "marriage_year": null
+    },
+    {
+      "id": 8,
+      "partner1_id": 24,
+      "partner2_id": 25,
+      "union_type": "married",
+      "marriage_year": null
+    },
+    {
+      "id": 9,
+      "partner1_id": 27,
+      "partner2_id": 28,
+      "union_type": "married",
+      "marriage_year": null
+    },
+    {
+      "id": 10,
+      "partner1_id": 34,
+      "partner2_id": 35,
+      "union_type": "married",
+      "marriage_year": null
+    },
+    {
+      "id": 11,
+      "partner1_id": 33,
+      "partner2_id": 40,
+      "union_type": "married",
+      "marriage_year": null
+    },
+    {
+      "id": 12,
+      "partner1_id": 37,
+      "partner2_id": 44,
+      "union_type": "married",
+      "marriage_year": null
+    },
+    {
+      "id": 13,
+      "partner1_id": 49,
+      "partner2_id": null,
+      "union_type": "married",
+      "marriage_year": null
+    }
+  ],
+  "childRelations": [
+    {
+      "id": 9,
+      "union_id": 6,
+      "child_id": 15
+    },
+    {
+      "id": 10,
+      "union_id": 6,
+      "child_id": 17
+    },
+    {
+      "id": 11,
+      "union_id": 6,
+      "child_id": 18
+    },
+    {
+      "id": 12,
+      "union_id": 6,
+      "child_id": 19
+    },
+    {
+      "id": 13,
+      "union_id": 6,
+      "child_id": 20
+    },
+    {
+      "id": 14,
+      "union_id": 7,
+      "child_id": 16
+    },
+    {
+      "id": 15,
+      "union_id": 7,
+      "child_id": 24
+    },
+    {
+      "id": 16,
+      "union_id": 8,
+      "child_id": 26
+    },
+    {
+      "id": 17,
+      "union_id": 7,
+      "child_id": 27
+    },
+    {
+      "id": 18,
+      "union_id": 9,
+      "child_id": 29
+    },
+    {
+      "id": 19,
+      "union_id": 9,
+      "child_id": 30
+    },
+    {
+      "id": 20,
+      "union_id": 9,
+      "child_id": 31
+    },
+    {
+      "id": 21,
+      "union_id": 7,
+      "child_id": 32
+    },
+    {
+      "id": 22,
+      "union_id": 7,
+      "child_id": 33
+    },
+    {
+      "id": 23,
+      "union_id": 10,
+      "child_id": 21
+    },
+    {
+      "id": 24,
+      "union_id": 10,
+      "child_id": 36
+    },
+    {
+      "id": 25,
+      "union_id": 10,
+      "child_id": 37
+    },
+    {
+      "id": 26,
+      "union_id": 10,
+      "child_id": 38
+    },
+    {
+      "id": 27,
+      "union_id": 10,
+      "child_id": 39
+    },
+    {
+      "id": 28,
+      "union_id": 11,
+      "child_id": 41
+    },
+    {
+      "id": 29,
+      "union_id": 11,
+      "child_id": 42
+    },
+    {
+      "id": 30,
+      "union_id": 11,
+      "child_id": 43
+    },
+    {
+      "id": 31,
+      "union_id": 12,
+      "child_id": 45
+    },
+    {
+      "id": 32,
+      "union_id": 12,
+      "child_id": 46
+    },
+    {
+      "id": 33,
+      "union_id": 12,
+      "child_id": 47
+    },
+    {
+      "id": 34,
+      "union_id": 12,
+      "child_id": 48
+    },
+    {
+      "id": 35,
+      "union_id": 13,
+      "child_id": 22
+    }
+  ]
+}

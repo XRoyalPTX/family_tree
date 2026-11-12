@@ -76,4 +76,116 @@ describe('Family Tree Layout & Kinship Engine', () => {
     expect(lineage.ancestorIds.has(2)).toBe(true);
     expect(lineage.activeUnionIds.has(10)).toBe(true);
   });
+
+  it('keeps sibling groups contiguous, sorted by age, and assigns generations correctly when ancestor is added', () => {
+    // Exact user scenario:
+    // Generation 1: Munkoyev (49)
+    // Generation 2: Gennadiy (22) & Mariya (23) (paternal grandparents), Bulat (34) & Mydygma (35) (maternal grandparents)
+    // Generation 3: Petr (16) & Zinaida (21), Vladimir (33) & Natalya (40), Dorzho (36), Elena (37)
+    // Generation 4: Kids of Petr & Zinaida: Vladislav (2004), Nomina (2004), Aryana (2010), Aynur (2013), Inna (2015)
+    //               Kids of Vladimir: Erdeni (2008), Erdem (no year), Ayur (no year)
+    const testPersons = [
+      { id: 49, first_name: 'Петр', last_name: 'Мункоев', gender: 'male' },
+      { id: 22, first_name: 'Геннадий', last_name: 'Архинчеев', gender: 'male', birth_year: 1952 },
+      { id: 23, first_name: 'Мария', last_name: 'Архинчеева', gender: 'female', birth_year: 1951 },
+      { id: 34, first_name: 'Булат', last_name: 'Цыдыпов', gender: 'male', birth_year: 1946 },
+      { id: 35, first_name: 'Мыдыгма', last_name: 'Цыдыпова', gender: 'female', birth_year: 1947 },
+      { id: 16, first_name: 'Петр', last_name: 'Архинчеев', gender: 'male', birth_year: 1977 },
+      { id: 21, first_name: 'Зинаида', last_name: 'Архинчеева', gender: 'female', birth_year: 1981 },
+      { id: 33, first_name: 'Владимир', last_name: 'Архинчеев', gender: 'male', birth_year: 1983 },
+      { id: 40, first_name: 'Наталья', last_name: 'Архинчеева', gender: 'female' },
+      { id: 36, first_name: 'Доржо', last_name: 'Цыдыпов', gender: 'male' },
+      // Children of Vladimir (Union 11)
+      { id: 41, first_name: 'Эрдэни', last_name: 'Архинчеев', gender: 'male', birth_year: 2008 },
+      { id: 42, first_name: 'Эрдэм', last_name: 'Архинчеев', gender: 'male' },
+      { id: 43, first_name: 'Аюр', last_name: 'Архинчеев', gender: 'male' },
+      // Children of Petr (Union 6)
+      { id: 15, first_name: 'Владислав', last_name: 'Архинчеев', gender: 'male', birth_year: 2004 },
+      { id: 20, first_name: 'Номина', last_name: 'Цыдыпова', gender: 'female', birth_year: 2004 },
+      { id: 17, first_name: 'Арьяна', last_name: 'Архинчеева', gender: 'female', birth_year: 2010 },
+      { id: 18, first_name: 'Айнур', last_name: 'Архинчеев', gender: 'male', birth_year: 2013 },
+      { id: 19, first_name: 'Инна', last_name: 'Архинчеева', gender: 'female', birth_year: 2015 },
+    ];
+
+    const testUnions = [
+      { id: 13, partner1_id: 49, partner2_id: null }, // Munkoyev
+      { id: 7, partner1_id: 22, partner2_id: 23 }, // Gennadiy & Mariya
+      { id: 10, partner1_id: 34, partner2_id: 35 }, // Bulat & Mydygma
+      { id: 6, partner1_id: 16, partner2_id: 21 }, // Petr & Zinaida
+      { id: 11, partner1_id: 33, partner2_id: 40 }, // Vladimir & Natalya
+    ];
+
+    const testChildRelations = [
+      { id: 1, union_id: 13, child_id: 22 }, // Gennadiy child of Munkoyev
+      { id: 2, union_id: 7, child_id: 16 },  // Petr child of Gennadiy
+      { id: 3, union_id: 7, child_id: 33 },  // Vladimir child of Gennadiy
+      { id: 4, union_id: 10, child_id: 21 }, // Zinaida child of Bulat & Mydygma
+      { id: 5, union_id: 10, child_id: 36 }, // Dorzho child of Bulat & Mydygma
+      // Petr's kids
+      { id: 6, union_id: 6, child_id: 15 },
+      { id: 7, union_id: 6, child_id: 20 },
+      { id: 8, union_id: 6, child_id: 17 },
+      { id: 9, union_id: 6, child_id: 18 },
+      { id: 10, union_id: 6, child_id: 19 },
+      // Vladimir's kids
+      { id: 11, union_id: 11, child_id: 41 },
+      { id: 12, union_id: 11, child_id: 42 },
+      { id: 13, union_id: 11, child_id: 43 },
+    ];
+
+    const layout = computeTreeLayout(testPersons, testUnions, testChildRelations, 'horizontal');
+    const nodeMap = new Map(layout.nodes.map((n) => [n.id, n]));
+
+    // 1. Generation checks:
+    // Munkoyev is Gen 0
+    expect(nodeMap.get(49).generation).toBe(0);
+    // Gennadiy & Mariya, Bulat & Mydygma must be Gen 1
+    expect(nodeMap.get(22).generation).toBe(1);
+    expect(nodeMap.get(23).generation).toBe(1);
+    expect(nodeMap.get(34).generation).toBe(1);
+    expect(nodeMap.get(35).generation).toBe(1);
+    // Their children must be Gen 2 (strictly greater than parents!)
+    expect(nodeMap.get(16).generation).toBe(2);
+    expect(nodeMap.get(21).generation).toBe(2);
+    expect(nodeMap.get(33).generation).toBe(2);
+    expect(nodeMap.get(36).generation).toBe(2);
+    // Grandchildren must be Gen 3
+    expect(nodeMap.get(15).generation).toBe(3);
+    expect(nodeMap.get(41).generation).toBe(3);
+
+    // 2. Sibling Contiguity check in Gen 4:
+    // Petr's children ids: 15, 20, 17, 18, 19
+    // Vladimir's children ids: 41, 42, 43
+    // All of Petr's children MUST have Y values either ALL smaller or ALL larger than Vladimir's children!
+    const petrKidsY = [15, 20, 17, 18, 19].map((id) => nodeMap.get(id).cy);
+    const vladKidsY = [41, 42, 43].map((id) => nodeMap.get(id).cy);
+
+    const minPetrY = Math.min(...petrKidsY);
+    const maxPetrY = Math.max(...petrKidsY);
+    const minVladY = Math.min(...vladKidsY);
+    const maxVladY = Math.max(...vladKidsY);
+
+    // They must be disjoint intervals (no interleaving!)
+    const noInterleaving = maxPetrY < minVladY || maxVladY < minPetrY;
+    expect(noInterleaving).toBe(true);
+
+    // 3. Chronological order within Petr's children:
+    // Vladislav (2004) <= Nomina (2004) < Aryana (2010) < Aynur (2013) < Inna (2015)
+    expect(nodeMap.get(15).cy).toBeLessThanOrEqual(nodeMap.get(20).cy);
+    expect(nodeMap.get(20).cy).toBeLessThan(nodeMap.get(17).cy);
+    expect(nodeMap.get(17).cy).toBeLessThan(nodeMap.get(18).cy);
+    expect(nodeMap.get(18).cy).toBeLessThan(nodeMap.get(19).cy);
+
+    // 4. Bridge couple adjacency:
+    // Zinaida (21) and Dorzho (36) are siblings and must be visually adjacent!
+    // The distance between them must be less than 150px (not thousands of pixels!)
+    const zinaidaCy = nodeMap.get(21).cy;
+    const dorzhoCy = nodeMap.get(36).cy;
+    expect(Math.abs(zinaidaCy - dorzhoCy)).toBeLessThanOrEqual(150);
+
+    // Petr (16) and his brother Vladimir (33) are also adjacent
+    const petrCy = nodeMap.get(16).cy;
+    const vladimirCy = nodeMap.get(33).cy;
+    expect(Math.abs(petrCy - vladimirCy)).toBeLessThanOrEqual(250);
+  });
 });
